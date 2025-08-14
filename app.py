@@ -6,7 +6,7 @@ from temporalio.worker import Worker
 import asyncio
 
 # Import workflow and activity modules
-from workflows.slack_webhook_workflow import SlackWebhookWorkflow
+from workflows.trigger_workflow_new_message import TriggerWorkflowNewMessage
 
 # Configure logging
 logging.basicConfig(
@@ -38,7 +38,7 @@ async def start_worker(client):
     worker = Worker(
         client,
         task_queue="slack-webhook-task-queue",
-        workflows=[SlackWebhookWorkflow],
+        workflows=[TriggerWorkflowNewMessage],
         activities=[
 
         ]
@@ -62,7 +62,7 @@ async def slack_webhook():
     # Start a workflow execution
     workflow_id = f"slack-webhook-{payload.get('event_id', 'unknown')}"
     await client.start_workflow(
-        SlackWebhookWorkflow.run,
+        TriggerWorkflowNewMessage.run,
         payload,
         id=workflow_id,
         task_queue="slack-webhook-task-queue"
@@ -93,5 +93,5 @@ if __name__ == "__main__":
     loop.run_until_complete(startup())
     
     # Start Flask app
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT", 8888))
     app.run(host="0.0.0.0", port=port)
