@@ -16,8 +16,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize Flask app
-app = Flask(__name__)
 
 # Temporal client connection
 async def start_temporal_client():
@@ -81,6 +79,7 @@ def health_check():
 
 if __name__ == "__main__":
     # Start the Temporal worker in a background task
+
     client = None
     
     async def startup():
@@ -92,6 +91,3 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(startup())
     
-    # Start Flask app
-    port = int(os.getenv("PORT", 8888))
-    app.run(host="0.0.0.0", port=port)
