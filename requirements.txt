@@ -1,0 +1,2 @@
+temporalio==1.15.0
+Flask==3.1.1
