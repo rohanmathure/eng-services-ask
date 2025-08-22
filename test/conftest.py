@@ -1,10 +1,11 @@
 import pytest
 
-from app import app as create_app
+from project.app import create_app
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def test_app():
     app = create_app()
-    yield app
-    app.teardown()
+    app.testing = True
+    client = app.test_client()
+    yield client

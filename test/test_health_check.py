@@ -1,8 +1,4 @@
-import requests
-
-
 class TestHealthCheck:
-    def test_health_check(self):
-        url = "http://localhost:8888/health"
-        response = requests.get(url)
+    def test_health_check(self, test_app):
+        response = test_app.get("/health")
         assert response.status_code == 200
