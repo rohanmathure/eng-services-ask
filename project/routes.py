@@ -25,19 +25,54 @@ async def slack_webhook():
     payload = request.get_json()
     logger.info(f"Received Slack webhook: {payload}")
 
-
     #TODO: Make it confirm to slack payload and also trigger it from a slack webhook
 
-    # Start a workflow execution
+    # Generate workflow ID
     workflow_id = f"slack-webhook-{payload.get('event_id', 'unknown')}"
-    client = await TemporalClient.get_client()
+    
+    try:
+        # Connect to Temporal client
+        logger.info("Connecting to Temporal client...")
+        client = await TemporalClient.get_client()
+        logger.info("Successfully connected to Temporal client")
+        
+    except Exception as e:
+        logger.error(f"Failed to connect to Temporal server: {str(e)}")
+        return jsonify({
+            "error": "Failed to connect to workflow service",
+            "details": str(e),
+            "workflow_id": workflow_id
+        }), 503
 
-    client.start_workflow(
-        RequestStart.run,
-        payload,
-        id=workflow_id,
-        task_queue="slack-webhook-task-queue"
-    )
-
-    logger.info(f"Started workflow with ID: {workflow_id}")
-    return jsonify({"status": "Workflow started", "workflow_id": workflow_id}), 202
+    try:
+        # Start workflow execution
+        logger.info(f"Starting workflow with ID: {workflow_id}")
+        workflow_handle = await client.start_workflow(
+            RequestStart.run,
+            payload,
+            id=workflow_id,
+            task_queue="slack-webhook-task-queue"
+        )
+        
+        # Verify workflow started successfully
+        if workflow_handle:
+            logger.info(f"Successfully started workflow with ID: {workflow_id}")
+            return jsonify({
+                "status": "Workflow started successfully", 
+                "workflow_id": workflow_id,
+                "workflow_run_id": workflow_handle.id
+            }), 202
+        else:
+            logger.error(f"Workflow handle is None for workflow ID: {workflow_id}")
+            return jsonify({
+                "error": "Workflow started but handle is invalid",
+                "workflow_id": workflow_id
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Failed to start workflow {workflow_id}: {str(e)}")
+        return jsonify({
+            "error": "Failed to start workflow",
+            "details": str(e),
+            "workflow_id": workflow_id
+        }), 500
