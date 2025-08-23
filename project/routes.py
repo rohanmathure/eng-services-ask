@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 import logging
 
 from clients.temporal import TemporalClient
-from workflows.RequestStart import RequestStart
+from workflows.request_start import RequestStart
 
 logger = logging.getLogger(__name__)
 
