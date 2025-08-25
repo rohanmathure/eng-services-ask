@@ -20,11 +20,17 @@ async def start_temporal_client():
     
     logger.info(f"Connecting to Temporal at {temporal_address}, namespace {temporal_namespace}")
     
+    # Configure TLS for Temporal Cloud
+    tls_config = None
+    if temporal_address and 'temporal.io' in temporal_address:
+        from temporalio.client import TLSConfig
+        tls_config = TLSConfig()  # Use default TLS for Temporal Cloud
+    
     return await Client.connect(
         temporal_address, 
         namespace=temporal_namespace,
         api_key=api_key if api_key else None,
-        tls=None
+        tls=tls_config
     )
 
 
