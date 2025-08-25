@@ -2,3 +2,6 @@ pytest==8.4.1
 coverage==7.10.3
 requests==2.32.4
 responses==0.25.8
+dotenv==0.9.9
+python-dotenv==1.1.1
+pytest-asyncio==1.1.0
