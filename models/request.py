@@ -10,4 +10,6 @@ class Request:
     reporter_email: str
     assignee_email: str
     component:str
+    channel: str
+    message: str
     

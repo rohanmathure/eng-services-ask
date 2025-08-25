@@ -6,6 +6,26 @@ services:
     ports:
       - "8888:8888"
     environment:
-      - TEMPORAL_HOST=temporal:7233
+      - TEMPORAL_ADDRESS=us-east-1.aws.api.temporal.io:7233
+      - TEMPORAL_NAMESPACE=rohan-test.uioy4
       - PORT=8888
-    command: flask run --host=0.0.0.0 --port=8888
+    env_file:
+      - .env.secret
+    command: python app.py
+    depends_on:
+      - temporal-worker
+  
+  temporal-worker:
+    build: .
+    environment:
+      - TEMPORAL_ADDRESS=us-east-1.aws.api.temporal.io:7233
+      - TEMPORAL_NAMESPACE=rohan-test.uioy4
+    env_file:
+      - .env.secret
+    command: python worker.py
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
